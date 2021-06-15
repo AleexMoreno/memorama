@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<style>
+
+		.estatus{
+            width: 200px;
+            height: 77px;
+            font-size: 100px;
+            float: left;
+            text-align: center;
+            padding-top: 10px;
+        }
+
+		.tablero{
+			margin: 0 auto;
+			width: 510px;
+			height: 1200px;
+			background-image: url(images/tablero.jpg);
+			background-size: 800px, 800px, auto;
+		}
+
+		.linea{
+			width: 550px;
+			height: 210px;
+			margin-top: 14px;
+			margin-left: 25px;
+			margin-bottom: 23px;
+		}
+
+		.linea2{
+			width: 550px;
+			height: 60px;
+			margin-top: 14px;
+			margin-left: 25px;
+			margin-bottom: 23px;
+		}
+
+		.carta{
+			width: 91px;
+			height: 205px;
+			float: left;
+			margin-left: 20px;
+			margin-top: 20px;
+			text-align: center;
+			background-image: url(images/0.jpg);
+			background-size: contain;
+			border-radius: 10px;
+		}
+
+	</style>
+</head>
+<body>
+<script>
+	var mat = [new Array(4), new Array(4), new Array(4), new Array(4)];
+	window.onload = loadMat();
+
+	function loadMat(){
+		for(var i = 0; i < mat.length; i++){
+			for(var j = 0; j < mat[i].length; j++){
+				mat[i][j] = "";
+			}
+		}
+		randomMat();
+		console.log("Comienza: Jugador 1.");
+		
+	}
+
+	function randomMat(){
+		var j = 0;
+
+		
+
+		for (var i = 0; i < 9; i++) {
+			while(isnullMat((Math.floor(Math.random() * 4)), (Math.floor(Math.random() * 4)), i) != 1){
+
+			}
+
+			while(isnullMat((Math.floor(Math.random() * 4)), (Math.floor(Math.random() * 4)), i) != 1){
+
+			}
+		}
+		console.log(mat);
+	}
+
+	function isnullMat(i, j, num){
+		console.log("i = "+ i +":j="+j+":num="+num);
+		if(mat[i][j] == ""){
+			mat[i][j] = num;
+			return 1;
+		}
+		return 0;
+	}
+
+
+	var volteo = 0; //Numero de cartas volteadas
+	var posiciones = ["", "", "", ""]; //guarda las coordenadas x,y de las cartas volteadas.
+	var p = 0;  //Posicion en el arreglo de arriba de las coordenadas.
+	var aciertos = 7; //Número de aciertos necesarios para terminar el juego.
+	var turno = 1; //Comienza jugador1
+	var aciertos_j1 = 0;
+	var aciertos_j2 = 0
+
+	function escoge(x,y){
+		var line = "p" + x + y; //Se concatenan las posiciones x,y para obtener el id del contenedor
+		var img;
+		
+		
+		
+		posiciones[p] = x;
+		posiciones[p+1] = y;
+		p = p+2;
+
+		document.getElementById("turno_jugador").innerHTML = "Jugador: "+turno;
+		document.getElementById("aj1").innerHTML = "Aciertos J1: "+aciertos_j1;
+		document.getElementById("aj2").innerHTML = "Aciertos J2: "+aciertos_j2;
+
+		if(volteo < 2){
+			img = mat[x][y];
+			document.getElementById(line).style.backgroundImage = 'url("images/'+img+'.jpg")';
+			document.getElementById(line).removeAttribute("onclick");
+			volteo++;
+			
+
+			if(volteo == 2){
+				var line1 = "p" + posiciones[0] + posiciones[1];
+				var line2 = "p" + posiciones[2] + posiciones[3];
+				
+				if(mat[posiciones[0]][posiciones[1]] != mat[posiciones[2]][posiciones[3]]){
+
+					bloqueo();
+					setTimeout(function(){
+						document.getElementById(line1).style.backgroundImage = 'url("images/0.jpg")';
+						document.getElementById(line2).style.backgroundImage = 'url("images/0.jpg")';
+						
+						desbloqueo();
+					}, 2000);
+					
+					if(turno == 1){
+						turno++;
+					}else{
+						turno = 1;
+					}
+
+				}else{
+					aciertos --;
+					desbloqueados[mat[x][y]] = true;
+					if(turno == 1){
+						aciertos_j1++;
+					}else{
+						aciertos_j2++;
+					}					
+				}
+				volteo = 0;
+				p = 0;
+				
+				console.log("Turno: Jugador"+turno);
+			}
+		}
+
+		reincia();
+	}
+
+	function bloqueo(){
+		var linea;
+
+		for(var i = 0; i < mat.length; i++){
+			for(var j = 0; j < mat[i].length; j++){
+				linea = "p" + i	+ j;	
+				document.getElementById(linea).removeAttribute("onclick");
+			}
+		}
+	}
+
+
+	var desbloqueados = ["",false, false, false, false, false, false, false, false];
+	function desbloqueo(){
+		for(var i = 0; i < mat.length; i++){
+			for(var j = 0; j < mat[i].length; j++){
+				linea = "p" + i	+ j;
+				if(desbloqueados[mat[i][j]] == false){
+					document.getElementById(linea).setAttribute("onclick", "escoge("+i+","+j+")");
+				}
+			}
+		}
+	}
+
+	function reincia(){
+
+		if(aciertos < 0){
+			if(aciertos_j1 < aciertos_j2){
+				alert("Juego terminado. Gana jugador 2");
+			}else if(aciertos_j1 > aciertos_j2){
+				alert("Juego terminado. Gana jugador 1");
+			}else{
+				alert("Juego terminado. Empate.");
+			}
+			
+			setTimeout("location.reload(true);",1000);
+		}
+	}
+
+</script>
+
+<div class="tablero">
+	
+	<div class = "linea2">
+		<div id = "turno_jugador" class = status></div>
+		<div id = "aj1" class = status></div>
+		<div id = "aj2" class = status></div>
+	</div>
+	<div class="linea">
+		<div id = "p00" class="carta" onclick="escoge(0,0)"></div>
+		<div id = "p01" class="carta" onclick="escoge(0,1)"></div>
+		<div id = "p02" class="carta" onclick="escoge(0,2)"></div>
+		<div id = "p03" class="carta" onclick="escoge(0,3)"></div>
+	</div>
+	<div class="linea">
+		<div id = "p10" class="carta" onclick="escoge(1,0)"></div>
+		<div id = "p11" class="carta" onclick="escoge(1,1)"></div>
+		<div id = "p12" class="carta" onclick="escoge(1,2)"></div>
+		<div id = "p13" class="carta" onclick="escoge(1,3)"></div>
+	</div>
+	<div class="linea">
+		<div id = "p20" class="carta" onclick="escoge(2,0)"></div>
+		<div id = "p21" class="carta" onclick="escoge(2,1)"></div>
+		<div id = "p22" class="carta" onclick="escoge(2,2)"></div>
+		<div id = "p23" class="carta" onclick="escoge(2,3)"></div>
+	</div>
+	<div class="linea">
+		<div id = "p30" class="carta" onclick="escoge(3,0)"></div>
+		<div id = "p31" class="carta" onclick="escoge(3,1)"></div>
+		<div id = "p32" class="carta" onclick="escoge(3,2)"></div>
+		<div id = "p33" class="carta" onclick="escoge(3,3)"></div>
+	</div>
+
+</div>
+
+</body>
+</html>
